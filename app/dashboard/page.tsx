@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [newTaskTitle, setNewTaskTitle] = useState<string>("");
   const [newTaskDescription, setNewTaskDescription] = useState<string>("");
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchTasks = async (): Promise<void> => {
     if (!user) return;
     setLoading(true);
