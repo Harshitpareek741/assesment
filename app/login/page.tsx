@@ -32,6 +32,7 @@ export default function Login() {
       router.push("/dashboard"); // Redirect to the dashboard after login
     } catch (error) {
       alert("Login failed");
+      console.log(error);
     }
   };
 

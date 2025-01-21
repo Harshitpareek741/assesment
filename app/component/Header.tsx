@@ -14,7 +14,6 @@ interface User {
 export const Header = () => {
   const { user } = useUser();
 
-  console.log(user);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const router = useRouter();
 
@@ -27,13 +26,11 @@ export const Header = () => {
   }, [user]);
 
   const handleSignOut = async () => {
-    try {
+   
       localStorage.removeItem("token");
       await axios.post("/api/logout");
       router.push("/login");
-    } catch (error) {
-      alert("Logout failed");
-    }
+
   };
 
   return (
@@ -56,10 +53,6 @@ export const Header = () => {
             Sign In
           </Link>
         )}
-
-        <Link href="/about" className="hover:text-slate-300">
-          About Us
-        </Link>
       </div>
     </div>
   );
