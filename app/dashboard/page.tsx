@@ -19,7 +19,6 @@ export default function Dashboard() {
   const [newTaskTitle, setNewTaskTitle] = useState<string>("");
   const [newTaskDescription, setNewTaskDescription] = useState<string>("");
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const fetchTasks = async (): Promise<void> => {
     if (!user) return;
     setLoading(true);
@@ -78,11 +77,10 @@ export default function Dashboard() {
     }
   };
 
- 
-
+  // Adjusted useEffect to remove tasks from the dependency array
   useEffect(() => {
     fetchTasks();
-  }, [fetchTasks, selectedDate, user?.id]);
+  }, [selectedDate, user]);
 
   return (
     <div className="min-h-screen h-screen w-screen bg-neutral-950 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] flex flex-col items-center p-4">
