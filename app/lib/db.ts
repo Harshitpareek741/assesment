@@ -15,9 +15,11 @@ interface Cached {
 
 
 declare global {
+    // eslint-disable-next-line no-var
     var mongoose: Cached | undefined;
 }
 
+// eslint-disable-next-line prefer-const
 let cached: Cached = global.mongoose || { conn: null, promise: null };
 
 if (!global.mongoose) {
