@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("token"); 
+
   const url = req.url;
 
 
