@@ -5,7 +5,7 @@ import axios from "axios";
 import { useUser } from "../context/usercontext";
 
 interface Task {
-  id: string;
+  _id: string;
   title: string;
   description: string;
   date: string;
@@ -18,6 +18,9 @@ export default function Dashboard() {
   const [loading, setLoading] = useState<boolean>(false);
   const [newTaskTitle, setNewTaskTitle] = useState<string>("");
   const [newTaskDescription, setNewTaskDescription] = useState<string>("");
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const [editingTaskTitle, setEditingTaskTitle] = useState<string>("");
+  const [editingTaskDescription, setEditingTaskDescription] = useState<string>("");
 
   const fetchTasks = async (): Promise<void> => {
     if (!user) return;
@@ -38,20 +41,32 @@ export default function Dashboard() {
     if (!user) return;
     try {
       await axios.post("/api/task/delete", { taskId });
-      setTasks(tasks.filter((task) => task.id !== taskId));
+      setTasks(tasks.filter((task) => task._id !== taskId));
       alert("Task deleted successfully");
     } catch {
       alert("Failed to delete task");
     }
   };
 
-  const handleEdit = async (taskId: string, updatedData: Partial<Task>): Promise<void> => {
-    if (!user) return;
+  const handleEditStart = (task: Task): void => {
+    setEditingTaskId(task._id);
+    setEditingTaskTitle(task.title);
+    setEditingTaskDescription(task.description);
+  };
+
+  const handleEditSave = async (): Promise<void> => {
+    if (!user || !editingTaskId) return;
     try {
-      const response = await axios.post("/api/task/update", { userId: user.id, taskId, ...updatedData });
+      const response = await axios.post("/api/task/update", {
+        userId: user.id,
+        taskId: editingTaskId,
+        title: editingTaskTitle,
+        description: editingTaskDescription,
+      });
       const updatedTask: Task = response.data.task;
-      setTasks(tasks.map((task) => (task.id === taskId ? updatedTask : task)));
+      setTasks(tasks.map((task) => (task._id === editingTaskId ? updatedTask : task)));
       alert("Task updated successfully");
+      setEditingTaskId(null);
     } catch {
       alert("Failed to update task");
     }
@@ -77,7 +92,6 @@ export default function Dashboard() {
     }
   };
 
-  // Adjusted useEffect to remove tasks from the dependency array
   useEffect(() => {
     fetchTasks();
   }, [selectedDate, user]);
@@ -121,25 +135,57 @@ export default function Dashboard() {
       ) : (
         <ul className="w-full max-w-2xl space-y-4">
           {tasks.map((task) => (
-            <li key={task.id} className="p-4 bg-gray-800 text-white rounded shadow-md flex justify-between items-center">
-              <div>
-                <h3 className="text-lg font-bold">{task.title}</h3>
-                <p className="text-sm">{task.description}</p>
-              </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => handleEdit(task.id, { title: "Updated Title" })}
-                  className="px-3 py-1 bg-blue-500 hover:bg-blue-700 rounded"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(task.id)}
-                  className="px-3 py-1 bg-red-500 hover:bg-red-700 rounded"
-                >
-                  Delete
-                </button>
-              </div>
+            <li key={task._id} className="p-4 bg-gray-800 text-white rounded shadow-md">
+              {editingTaskId === task._id ? (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={editingTaskTitle}
+                    onChange={(e) => setEditingTaskTitle(e.target.value)}
+                    className="p-2 rounded border border-gray-300 w-full"
+                  />
+                  <textarea
+                    value={editingTaskDescription}
+                    onChange={(e) => setEditingTaskDescription(e.target.value)}
+                    className="p-2 rounded border border-gray-300 w-full"
+                  />
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={handleEditSave}
+                      className="px-3 py-1 bg-green-500 hover:bg-green-700 rounded"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingTaskId(null)}
+                      className="px-3 py-1 bg-gray-500 hover:bg-gray-700 rounded"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-bold">{task.title}</h3>
+                    <p className="text-sm">{task.description}</p>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleEditStart(task)}
+                      className="px-3 py-1 bg-blue-500 hover:bg-blue-700 rounded"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(task._id)}
+                      className="px-3 py-1 bg-red-500 hover:bg-red-700 rounded"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>

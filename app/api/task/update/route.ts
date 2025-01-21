@@ -1,19 +1,14 @@
-import connectDB from  "../../../lib/db"; 
+import connectDB from "../../../lib/db"; 
 import Task from "@/app/models/task";
 import { NextResponse } from "next/server";
 
-export async function PUT(req: Request) {
+export async function POST(req: Request) {
   try {
     const { taskId, title, description, date } = await req.json();
 
-    if (!taskId || !title || !description || !date) {
-      return NextResponse.json(
-        { error: "TaskId, title, description, and date are required." },
-        { status: 400 }
-      );
-    }
 
     await connectDB();
+
 
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
@@ -33,7 +28,7 @@ export async function PUT(req: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
+    console.error("Error updating task:", error);
     return NextResponse.json(
       { error: "Internal server error." },
       { status: 500 }

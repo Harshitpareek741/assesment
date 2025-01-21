@@ -2,10 +2,10 @@ import connectDB from  "../../../lib/db";
 import Task from "@/app/models/task";
 import { NextResponse } from "next/server";
 
-export async function DELETE(req: Request) {
+export async function POST(req: Request) {
   try {
     const { taskId } = await req.json();
-
+    
     if (!taskId) {
       return NextResponse.json(
         { error: "TaskId is required." },
