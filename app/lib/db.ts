@@ -1,7 +1,6 @@
+import mongoose, { Connection } from 'mongoose'
 
-import mongoose from 'mongoose'
-
-const MONGODB_URI = "mongodb+srv://harshitpareek132:dvWujEx9xYKA26pK@cluster0.b6c1v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const MONGODB_URI = process.env.NEXT_PUBLIC_MONGODB_URI || "";
 
 if (!MONGODB_URI) {
     throw new Error(
@@ -9,33 +8,45 @@ if (!MONGODB_URI) {
     )
 }
 
-let cached = global.mongoose
-
-if (!cached) {
-    cached = global.mongoose = { conn: null, promise: null }
+interface Cached {
+    conn: Connection | null;
+    promise: Promise<Connection> | null;
 }
 
-async function dbConnect() {
+
+declare global {
+    var mongoose: Cached | undefined;
+}
+
+let cached: Cached = global.mongoose || { conn: null, promise: null };
+
+if (!global.mongoose) {
+    global.mongoose = cached;
+}
+
+async function dbConnect(): Promise<Connection> {
     if (cached.conn) {
-        return cached.conn
+        return cached.conn;
     }
+
     if (!cached.promise) {
         const opts = {
             bufferCommands: false,
-        }
-        cached.promise = mongoose.connect(MONGODB_URI, opts).then(mongoose => {
-            console.log('Db connected')
-            return mongoose
-        })
-    }
-    try {
-        cached.conn = await cached.promise
-    } catch (e) {
-        cached.promise = null
-        throw e
+        };
+        cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+            console.log('Db connected');
+            return mongoose.connection;
+        });
     }
 
-    return cached.conn
+    try {
+        cached.conn = await cached.promise;
+    } catch (e) {
+        cached.promise = null;
+        throw e;
+    }
+
+    return cached.conn;
 }
 
-export default dbConnect
+export default dbConnect;
