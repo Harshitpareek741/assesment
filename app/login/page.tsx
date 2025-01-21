@@ -5,10 +5,10 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 
 export default function Login() {
-  const api: string = "http://localhost:3000/api/auth/login";
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -18,8 +18,10 @@ export default function Login() {
       return;
     }
 
+    setLoading(true);
+
     try {
-      const response = await axios.post<{ token: string }>(api, { email, password });
+      const response = await axios.post<{ token: string }>("/api/login", { email, password });
       const token = response.data.token;
 
       if (!token) {
@@ -29,10 +31,12 @@ export default function Login() {
 
       localStorage.setItem("token", token);
       alert("User logged in");
-      router.push("/dashboard"); // Redirect to the dashboard after login
-    } catch (error) {
-      alert("Login failed");
-      console.log(error);
+      router.push("/dashboard");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,9 +68,10 @@ export default function Login() {
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-950 hover:bg-green-950 text-white p-2 rounded transition"
+          disabled={loading}
+          className={`w-full ${loading ? "bg-gray-400" : "bg-blue-950 hover:bg-green-950"} text-white p-2 rounded transition`}
         >
-          Login
+          {loading ? "Logging in..." : "Login"}
         </button>
         <div className="text-center mt-4">
           <p className="text-sm text-white">
