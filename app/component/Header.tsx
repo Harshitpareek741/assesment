@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useUser } from "../context/usercontext";
 import { useState } from "react";
 import { useEffect } from "react";
-// import axios from "axios";
-// import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 interface User {
   id: string;
@@ -13,10 +13,10 @@ interface User {
 }
 
 export const Header = () => {
-  const { user } = useUser();
+  const { user ,setUser } = useUser();
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  // const router = useRouter();
+  const router = useRouter();
 
   useEffect(() => {
     if (user) {
@@ -26,13 +26,13 @@ export const Header = () => {
     }
   }, [user]);
 
-  // const handleSignOut = async () => {
+  const handleSignOut = async () => {
    
-  //     localStorage.removeItem("token");
-  //     await axios.post("/api/logout");
-  //     router.push("/login");
-
-  // };
+      await axios.get("/api/auth/logout");
+      localStorage.removeItem("token");
+      router.push("/login");
+      setUser(null);
+  };
 
   return (
     <div className="bg-slate-800 text-white w-full flex items-center justify-between px-6 py-4 shadow-md">
@@ -47,18 +47,13 @@ export const Header = () => {
           Home
         </Link>
 
-       {
-        currentUser ? 
-        (<Link href="/login" className="hover:text-slate-300">
-          Sign In
-        </Link>) : ""
-       } 
-
-        {/* {currentUser ? (
+        {currentUser ? (
           <button onClick={handleSignOut}>Sign Out</button>
         ) : (
-         
-        )} */}
+          <Link href="/login" className="hover:text-slate-300">
+          Sign In
+        </Link>
+        )}
       </div>
     </div>
   );
