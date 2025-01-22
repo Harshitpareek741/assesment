@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import axios from "axios";
 import { useUser } from "../context/usercontext";
+import { toast } from "react-toastify"; // Import toast
 
 interface Task {
   _id: string;
@@ -31,7 +32,7 @@ export default function Dashboard() {
       });
       setTasks(response.data.tasks);
     } catch {
-      alert("Failed to fetch tasks");
+      toast.error("Failed to fetch tasks");
     } finally {
       setLoading(false);
     }
@@ -42,9 +43,9 @@ export default function Dashboard() {
     try {
       await axios.post("/api/task/delete", { taskId });
       setTasks(tasks.filter((task) => task._id !== taskId));
-      alert("Task deleted successfully");
+      toast.success("Task deleted successfully");
     } catch {
-      alert("Failed to delete task");
+      toast.error("Failed to delete task");
     }
   };
 
@@ -65,10 +66,10 @@ export default function Dashboard() {
       });
       const updatedTask: Task = response.data.task;
       setTasks(tasks.map((task) => (task._id === editingTaskId ? updatedTask : task)));
-      alert("Task updated successfully");
+      toast.success("Task updated successfully");
       setEditingTaskId(null);
     } catch {
-      alert("Failed to update task");
+      toast.error("Failed to update task");
     }
   };
 
@@ -86,9 +87,9 @@ export default function Dashboard() {
       setTasks([...tasks, newTask]);
       setNewTaskTitle("");
       setNewTaskDescription("");
-      alert("Task created successfully");
+      toast.success("Task created successfully");
     } catch {
-      alert("Failed to create task");
+      toast.error("Failed to create task");
     }
   };
 

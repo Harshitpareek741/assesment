@@ -1,5 +1,12 @@
 "use client";
 import React, { useState, FormEvent } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function isStrongPassword(password: string): boolean {
+  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+  return strongPasswordRegex.test(password);
+}
 
 export default function Register() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -19,6 +26,13 @@ export default function Register() {
     setError(null);
     setSuccess(null);
 
+    if (!isStrongPassword(data.password)) {
+      setError("Password must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.");
+      toast.error("Password is too weak!");
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -32,11 +46,11 @@ export default function Register() {
         throw new Error("Failed to register user.");
       }
 
-      const result = await response.json();
       setSuccess("User registered successfully!");
-      console.log("User registered successfully:", result);
+      toast.success("User registered successfully!");
     } catch (err) {
       setError("An error occurred. Please try again.");
+      toast.error("Registration failed!");
       console.error("Error:", err);
     } finally {
       setLoading(false);
@@ -71,6 +85,7 @@ export default function Register() {
             className="p-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
           />
         </div>
+        <ToastContainer />
         <button
           type="submit"
           disabled={loading}

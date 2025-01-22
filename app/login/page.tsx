@@ -5,6 +5,8 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useUser } from "../context/usercontext";
 import jwt from 'jsonwebtoken';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Login() {
   const router = useRouter();
@@ -17,7 +19,7 @@ export default function Login() {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Email or password are required");
+      toast.error("Email or password are required");
       return;
     }
 
@@ -28,7 +30,7 @@ export default function Login() {
       const token = response.data.token;
 
       if (!token) {
-        alert("Server error");
+        toast.error("Server error");
         return;
       }
 
@@ -39,10 +41,10 @@ export default function Login() {
         setUser({ id: decodedToken.id, email: decodedToken.email });
       }
 
-      alert("User logged in");
+      toast.success("User logged in");
       router.push("/dashboard");
     } catch {
-      alert( "Login failed");
+      toast.error("Login failed");
     } finally {
       setLoading(false);
     }
@@ -93,6 +95,7 @@ export default function Login() {
           </p>
         </div>
       </form>
+      <ToastContainer />
     </div>
   );
 }
