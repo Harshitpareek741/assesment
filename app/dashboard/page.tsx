@@ -142,12 +142,12 @@ export default function Dashboard() {
                     type="text"
                     value={editingTaskTitle}
                     onChange={(e) => setEditingTaskTitle(e.target.value)}
-                    className="p-2 rounded border border-gray-300 w-full"
+                    className="p-2 rounded border text-black border-gray-300 w-full"
                   />
                   <textarea
                     value={editingTaskDescription}
                     onChange={(e) => setEditingTaskDescription(e.target.value)}
-                    className="p-2 rounded border border-gray-300 w-full"
+                    className="p-2 rounded border text-black border-gray-300 w-full"
                   />
                   <div className="flex space-x-2">
                     <button
