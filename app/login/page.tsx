@@ -3,9 +3,12 @@
 import { useState, FormEvent } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useUser } from "../context/usercontext";
+import jwt from 'jsonwebtoken';
 
 export default function Login() {
   const router = useRouter();
+  const { setUser } = useUser();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -21,7 +24,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response =  await axios.post("/api/auth/login", { email : email , password : password });
+      const response = await axios.post("/api/auth/login", { email, password });
       const token = response.data.token;
 
       if (!token) {
@@ -30,11 +33,16 @@ export default function Login() {
       }
 
       localStorage.setItem("token", token);
+
+      const decodedToken = jwt.decode(token);
+      if (decodedToken && typeof decodedToken !== "string") {
+        setUser({ id: decodedToken.id, email: decodedToken.email });
+      }
+
       alert("User logged in");
       router.push("/dashboard");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      alert(error.response?.data?.message || "Login failed");
+    } catch {
+      alert( "Login failed");
     } finally {
       setLoading(false);
     }

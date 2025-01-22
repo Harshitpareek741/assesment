@@ -1,29 +1,30 @@
 "use client";
 
 import Link from "next/link";
-// import { useUser } from "../context/usercontext";
-// import { useEffect } from "react";
+import { useUser } from "../context/usercontext";
+import { useState } from "react";
+import { useEffect } from "react";
 // import axios from "axios";
 // import { useRouter } from "next/navigation";
 
-// interface User {
-//   id: string;
-//   email: string;
-// }
+interface User {
+  id: string;
+  email: string;
+}
 
 export const Header = () => {
-  // const { user } = useUser();
+  const { user } = useUser();
 
-  // const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   // const router = useRouter();
 
-  // useEffect(() => {
-  //   if (user) {
-  //     setCurrentUser(user);
-  //   } else {
-  //     setCurrentUser(null);
-  //   }
-  // }, [user]);
+  useEffect(() => {
+    if (user) {
+      setCurrentUser(user);
+    } else {
+      setCurrentUser(null);
+    }
+  }, [user]);
 
   // const handleSignOut = async () => {
    
@@ -46,12 +47,17 @@ export const Header = () => {
           Home
         </Link>
 
+       {
+        currentUser ? 
+        (<Link href="/login" className="hover:text-slate-300">
+          Sign In
+        </Link>) : ""
+       } 
+
         {/* {currentUser ? (
           <button onClick={handleSignOut}>Sign Out</button>
         ) : (
-          <Link href="/login" className="hover:text-slate-300">
-            Sign In
-          </Link>
+         
         )} */}
       </div>
     </div>
